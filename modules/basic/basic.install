@@ -1,0 +1,44 @@
+<?php
+	function mymodule_schema() {
+		$schema['basic_db'] = array(
+		  'description' => 'Basic Information given from forms',
+		  'fields' => array(
+		    'pid' => array(
+		      'description' => 'Primary ID',
+		      'type' => 'serial',
+		      'unsigned' => TRUE,
+		      'size' => 'big',
+		      'not null' => TRUE,
+		    ),
+		    'first_name' => array(
+		      'description' => 'First name of individual',
+		      'type' => 'text',
+		      'not null' => TRUE,
+		    ),
+		    'last_name' => array(
+		      'description' => 'Last name of individual',
+		      'type' => 'text',
+		      'not null' => TRUE,
+		    ),
+		    'age' => array(
+		      'description' => 'Age of individual',
+		      'type' => 'int',
+		      'size' => 'tiny',
+		      'not null' => TRUE,
+		    ),
+		    'state' => array(
+		      'description' => 'State where individual lives',
+		      'type' => 'text',
+		      'not null' => TRUE,
+		    ),
+		    'gender' => array(
+		      'description' => 'Gender preference of individual',
+		      'type' => 'text',
+		      'not null' => TRUE,
+		    ),
+		  ),
+		
+		  'primary key' => array('pid'),
+		);
+	return $schema;
+	}

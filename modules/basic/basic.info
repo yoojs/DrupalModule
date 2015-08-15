@@ -1,0 +1,5 @@
+name = Basic
+description = "Collects basic info in a form and sends it to database."
+package = Core
+version = VERSION
+core = 7.x

@@ -1,0 +1,307 @@
+<?php
+
+	function basic_permission(){
+		return array(
+		    'administer my module' => array(
+			'title' => t('Administer my module'),
+			'description' => t('Perform administration tasks for my module.'),
+			),
+		);
+	}
+
+	//Implements hook_menu
+	function basic_menu(){
+		$items = array();
+		
+		$items['basic_form'] = array(
+			'title'=>'Basic Information Form',
+			'description'=>'Info',
+			'page callback'=>'drupal_get_form',
+			'page arguments'=>array('basic_showBasicForm'),
+			'access callback'=>'user_access',
+			'access arguments'=>array('access content'),
+			'type'=>MENU_NORMAL_ITEM
+			);
+			
+		$items['page'] = array(
+			
+			'title'=>'Admin Only Basic Information Table',
+			'description'=>'Info',
+			'page callback'=>'basic_adminPage',
+			'access arguments'=>array('administer my module'),
+			'type'=>MENU_NORMAL_ITEM
+			
+			);
+
+			
+
+		return $items;
+	}
+	function basic_adminPage(){
+	 	$header = array('First Name', 'Last Name', 'Age', 'State', 'Gender');
+	 	$rows = array();
+	
+	 	$sql = 'SELECT first_name, last_name, age, state, gender FROM {basic_db} ORDER BY last_name';
+	 	$res = db_query($sql);
+	 	$i = 0;
+	 	foreach($res as $row){
+
+	 		$rows[$i] = array($row->first_name,$row->last_name,$row->age, $row->state, 
+	 			$row->gender);
+	 		$i++;
+	 	}
+	 	$sql = 'select state, count(*) as count FROM basic_db GROUP BY state;';
+	 	$chart = db_query($sql);
+	 	$header1 = array();
+	 	$states = array();
+	 	$i = 0;
+	 	foreach($chart as $headers){
+		 	$header1[$i] = $headers->state;
+		 	$states[$i] = $headers->count;
+		 	$i++;
+	 	}
+	 	
+		$settings['chart']['chartOne'] = array(  
+		    'header' => $header1,
+		    'rows' => array($states),
+		    'columns' => array('States by count'),
+		    'chartType' => 'Gauge',
+		    'options' => array(  
+		      'title' => 'Number of Registered Individuals By State',
+		      'width' => 625,
+		      'height' => 400  
+		    )   
+		  );
+		 
+		
+		//Draw it.
+		$page = theme('table', array('header'=>$header, 'rows'=>$rows));
+		$page .= '<div style = "display:inline-block">'.draw_chart($settings)['markup'].'</div>';
+		return $page;
+		
+
+
+
+		 
+	}
+
+	function basic_showBasicForm(){
+		$form['name']['first'] = array(
+		    '#type' => 'textfield', 
+		    '#title' => t('First Name'),
+		    '#size' => 10,
+		    '#maxlength' => 10,
+		    '#required' => TRUE,
+		);
+		$form['name']['last'] = array(
+		    '#type' => 'textfield', 
+		    '#title' => t('Last Name'),
+		    '#size' => 10,
+		    '#maxlength' => 10,
+		    '#required' => TRUE,
+		);
+		$form['age'] = array(
+		    '#type' => 'textfield', 
+		    '#title' => t('Age'),
+		    '#size' => 10,
+		    '#maxlength' => 10,
+		    '#required' => TRUE, 
+		);
+		$form['state'] = array(
+		    '#type' => 'select', 
+		    '#title' => t('State'),
+		    '#required' => TRUE, 
+		    '#options' => array(
+			t('Alabama'),
+			t('Alaska'),
+			t('Arizona'),
+			t('Arkansas'),
+			t('California'),
+			t('Colorado'),
+			t('Connecticut'),
+			t('Delaware'),
+			t('Florida'),
+			t('Georgia'),
+			t('Hawaii'),
+			t('Idaho'),
+			t('Illinois'),
+			t('Indiana'),
+			t('Iowa'),
+			t('Kansas'),
+			t('Kentucky'),
+			t('Louisiana'),
+			t('Maine'),
+			t('Maryland'),
+			t('Massachusetts'),
+			t('Michigan'),
+			t('Minnesota'),
+			t('Mississippi'),
+			t('Missouri'),
+			t('Montana'),
+			t('Nebraska'),
+			t('Nevada'),
+			t('New Hampshire'),
+			t('New Jersey'),
+			t('New Mexico'),
+			t('New York'),
+			t('North Carolina'),
+			t('North Dakota'),
+			t('Ohio'),
+			t('Oklahoma'),
+			t('Oregon'),
+			t('Pennsylvania'),
+			t('Rhode Island'),
+			t('South Dakota'),
+			t('Tennessee'),
+			t('Texas'),
+			t('Utah'),
+			t('Vermont'),
+			t('Virginia'),
+			t('Washington'),
+			t('West Virginia'),
+			t('Wisconsin'),
+			t('Wyoming'),
+			)
+		);
+		$form['gender'] = array(
+			'#type' => 'radios',
+			'#title' => t('Gender'),
+			'#required' => TRUE, 
+			'#options' => array(
+			t('Male'),
+			t('Female'),
+			t('Other'),
+			),
+		);
+		
+
+		$form['submit_button'] = array(
+		    '#type' => 'submit',
+		    '#value' => t('Submit'),
+		);
+		$form['#submit_button'][] = 'basic_showBasicForm_submit';
+		return $form;
+	}
+
+	function basic_showBasicForm_submit($form, &$form_state){
+		$info = $form_state['values'];
+		$fname = $info['first'];
+		$lname = $info['last'];
+		$age = $info['age'];
+		$s = array(
+			t('Alabama'),
+			t('Alaska'),
+			t('Arizona'),
+			t('Arkansas'),
+			t('California'),
+			t('Colorado'),
+			t('Connecticut'),
+			t('Delaware'),
+			t('Florida'),
+			t('Georgia'),
+			t('Hawaii'),
+			t('Idaho'),
+			t('Illinois'),
+			t('Indiana'),
+			t('Iowa'),
+			t('Kansas'),
+			t('Kentucky'),
+			t('Louisiana'),
+			t('Maine'),
+			t('Maryland'),
+			t('Massachusetts'),
+			t('Michigan'),
+			t('Minnesota'),
+			t('Mississippi'),
+			t('Missouri'),
+			t('Montana'),
+			t('Nebraska'),
+			t('Nevada'),
+			t('New Hampshire'),
+			t('New Jersey'),
+			t('New Mexico'),
+			t('New York'),
+			t('North Carolina'),
+			t('North Dakota'),
+			t('Ohio'),
+			t('Oklahoma'),
+			t('Oregon'),
+			t('Pennsylvania'),
+			t('Rhode Island'),
+			t('South Dakota'),
+			t('Tennessee'),
+			t('Texas'),
+			t('Utah'),
+			t('Vermont'),
+			t('Virginia'),
+			t('Washington'),
+			t('West Virginia'),
+			t('Wisconsin'),
+			t('Wyoming'),
+			);
+		$state = $s[$info['state']];
+		switch($info['gender']){
+			case(0):
+				$gender = 'Male';
+				break;
+			case(1):
+				$gender = 'Female';
+				break;
+			case(2):
+				$gender = 'Other';
+				break;
+			default:
+				break;
+			}
+				
+		if(!(is_numeric($age))) {
+			form_error($form, t('%name must be an integer.', array('%name' => t('Age'))));
+		}
+		else{
+			$insert = db_insert('basic_db')
+				->fields(array(
+					'first_name' => $fname,
+					'last_name' => $lname,
+					'age' => $age,
+					'state' => $state,
+					'gender' => $gender,
+					))
+				->execute();
+			//db_query("INSERT INTO (basic_db) (first_name,last_name,age,state,gender) VALUES ('%s,
+				//'%s', '%d', '%s', '%s')",array($fname, $lname, $age, $state, $gender));
+
+			
+			drupal_set_message("Hello ".$fname." ".$lname.", your age is ".$age." and you are from 
+				".$state." and your gender is ".$gender. ". You are now in our database, 
+					thank you.");	
+		}
+	}
+	
+	function basic_block_info(){
+		$blocks['basic-info'] = array(
+			'info' => t('Public basic info block title'),
+			'cache' => DRUPAL_NO_CACHE,
+		);
+		$blocks['basic-Admin'] = array(
+			'info' => t('Administrative block title'),
+			'cache' => DRUPAL_NO_CACHE,
+		);
+		return $blocks;
+	}
+
+	function basic_block_view($delta = ''){
+		$block = array();
+		switch($delta){
+			case 'basic-info':
+				$block['subject'] = t('Basic Information Form');
+				$block['content'] = drupal_get_form('basic_showBasicForm');
+				break;
+			case 'basic-Admin':
+				$block['subject'] = t('Admin Information Form');
+				$block['content'] = t('pop');
+				break;
+		}
+		return $block;
+	}
+
+
